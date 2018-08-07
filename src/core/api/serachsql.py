@@ -184,12 +184,17 @@ class query_worklf(baseview.BaseView):
             work_id = util.workId()
             if not query_switch['query']:
                 query_per = 1
+            else:
                 userinfo = Account.objects.filter(username=audit, group='admin').first()
-                thread = threading.Thread(
-                    target=push_message,
-                    args=({'to_user': request.user, 'workid': work_id}, 5, request.user, userinfo.email, work_id, '提交')
-                )
-                thread.start()
+                try:
+                    thread = threading.Thread(
+                        target=push_message,
+                        args=(
+                        {'to_user': request.user, 'workid': work_id}, 5, request.user, userinfo.email, work_id, '提交')
+                    )
+                    thread.start()
+                except Exception as e:
+                    CUSTOM_ERROR.error(f'{e.__class__.__name__}: {e}')
             query_order.objects.create(
                 work_id=work_id,
                 instructions=instructions,
@@ -216,8 +221,8 @@ class query_worklf(baseview.BaseView):
             t.start()
             userinfo = Account.objects.filter(username=query_info.username).first()
             thread = threading.Thread(target=push_message, args=(
-            {'to_user': query_info.username, 'workid': query_info.work_id}, 6, query_info.username, userinfo.email,
-            work_id, '同意'))
+                {'to_user': query_info.username, 'workid': query_info.work_id}, 6, query_info.username, userinfo.email,
+                work_id, '同意'))
             thread.start()
             return Response('查询工单状态已更新！')
 
@@ -227,8 +232,8 @@ class query_worklf(baseview.BaseView):
             query_info = query_order.objects.filter(work_id=work_id).order_by('-id').first()
             userinfo = Account.objects.filter(username=query_info.username).first()
             thread = threading.Thread(target=push_message, args=(
-            {'to_user': query_info.username, 'workid': query_info.work_id}, 7, query_info.username, userinfo.email,
-            work_id, '驳回'))
+                {'to_user': query_info.username, 'workid': query_info.work_id}, 7, query_info.username, userinfo.email,
+                work_id, '驳回'))
             thread.start()
             return Response('查询工单状态已更新！')
 

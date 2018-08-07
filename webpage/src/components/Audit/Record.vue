@@ -40,7 +40,7 @@
             key: 'text'
           },
           {
-            title: '执行时间',
+            title: '提交时间',
             key: 'date',
             sortType: 'desc'
           },
